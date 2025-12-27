@@ -4,14 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KidTutor: Jitya's Math Adventure</title>
-    <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Confetti Library -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Fredoka', sans-serif; }
         .bounce-hover { transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .bounce-hover:hover { transform: scale(1.05); }
         .tap-active:active { transform: scale(0.95); }
@@ -21,207 +18,303 @@
             100% { transform: translateY(0px) rotate(0deg); }
         }
         .float-animation { animation: float 4s ease-in-out infinite; }
-        .card-gradient { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); }
     </style>
 </head>
 <body class="bg-amber-50 min-h-screen pb-12 text-slate-800">
-    <!-- Colorful Header -->
     <header class="bg-gradient-to-r from-pink-400 via-yellow-400 to-cyan-400 p-6 shadow-lg sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto flex items-center justify-between">
+        <div class="max-w-5xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3 cursor-pointer" onclick="goHome()">
                 <div class="bg-white p-2 rounded-2xl shadow-md">
-                    <svg class="w-8 h-8 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path>
-                    </svg>
+                    <svg class="w-8 h-8 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path></svg>
                 </div>
                 <h1 class="text-3xl font-black text-white tracking-tight drop-shadow-sm">KidTutor</h1>
             </div>
-            <div class="flex items-center gap-4">
-                <div class="flex items-center gap-2 bg-white/30 backdrop-blur-md px-4 py-2 rounded-full border border-white/40">
-                    <span class="text-yellow-200">⭐</span>
-                    <span class="font-bold text-white">Math Whiz</span>
-                </div>
-            </div>
+            <div id="header-stats" class="flex items-center gap-4"></div>
         </div>
     </header>
 
-    <main class="max-w-4xl mx-auto px-4 mt-8">
-        <div id="app-content">
-            <!-- Content will be injected by JavaScript -->
-        </div>
+    <main class="max-w-5xl mx-auto px-4 mt-8">
+        <div id="app-content"></div>
     </main>
-
-    <footer class="mt-12 text-center text-slate-400 font-medium">
-        <p>© 2025 KidTutor • Making Learning Fun for Jitya! ✨</p>
-    </footer>
 
     <script>
         const MATH_CURRICULUM = [
             {
-                id: 'counting',
-                title: 'Counting to 20',
-                icon: '🔢',
-                color: 'bg-pink-500',
+                id: 'ch7', title: 'Ch 7: Addition & Subtraction to 100', icon: '🧮', color: 'bg-pink-500',
                 learn: {
-                    concept: 'Counting is finding out how many things are in a group! We start at 1 and go up one by one.',
-                    visual: '🍎 🍎 🍎 🍎 🍎 <br> 1, 2, 3, 4, 5!',
-                    voiceText: 'Hi Jitya! Let\'s learn to count. Counting is like climbing a ladder. We start at one, then two, then three! Can you count your favorite toys with me?'
+                    concept: 'Adding and subtracting bigger numbers is just like smaller ones! We look at Tens and Ones. 25 + 4 = 29. 50 - 10 = 40.',
+                    voiceText: "Hi Jitya! Let's learn to add and subtract up to 100. Remember, always start from the Ones place. If you have 25 candies and get 4 more, you have 29! If you have 50 and give 10 away, you have 40 left. You can do it!"
                 },
                 practice: [
-                    { q: 'What number comes right after 12?', options: ['11', '13', '14', '10'], a: '13', help: 'Start at 10 and count up: 10, 11, 12... the next number is 13!' },
-                    { q: 'How many stars are here? ⭐⭐⭐', options: ['2', '4', '3', '5'], a: '3', help: 'Point to each star and say the numbers: one, two, three!' }
+                    { q: '20 + 5 = ?', options: ['25', '15', '30', '205'], a: '25', help: '2 tens and 5 ones makes 25.' },
+                    { q: '45 - 5 = ?', options: ['40', '50', '35', '45'], a: '40', help: 'Take away 5 ones from 45. You have 4 tens left.' },
+                    { q: '32 + 10 = ?', options: ['42', '33', '22', '52'], a: '42', help: 'Adding 10 is like jumping one step down on a number grid.' },
+                    { q: '60 - 20 = ?', options: ['40', '80', '30', '50'], a: '40', help: '6 tens minus 2 tens is 4 tens.' },
+                    { q: '15 + 15 = ?', options: ['30', '20', '25', '35'], a: '30', help: '10+10 is 20, 5+5 is 10. 20+10 is 30.' },
+                    { q: '₹10 pencil + ₹5 eraser = ?', options: ['₹15', '₹5', '₹20', '₹10'], a: '₹15', help: 'Add the prices: 10 + 5 = 15.' },
+                    { q: '99 - 1 = ?', options: ['98', '100', '90', '97'], a: '98', help: 'Count one step back from 99.' },
+                    { q: '25 + 25 = ?', options: ['50', '40', '60', '45'], a: '50', help: 'Two 25s make 50.' },
+                    { q: '80 - 10 = ?', options: ['70', '90', '60', '80'], a: '70', help: 'Take one ten away from 8 tens.' },
+                    { q: '12 + 8 = ?', options: ['20', '18', '22', '10'], a: '20', help: '8 and 2 make a ten! 12 + 8 is 20.' }
                 ],
                 test: [
-                    { q: 'What is 10 + 5?', options: ['12', '15', '18', '20'], a: '15' },
-                    { q: 'Which number is smaller than 8?', options: ['10', '12', '5', '9'], a: '5' },
-                    { q: 'Count the dots: ●●●●', options: ['3', '4', '5', '6'], a: '4' },
-                    { q: 'What comes before 20?', options: ['18', '21', '19', '17'], a: '19' },
-                    { q: 'Which is the biggest number?', options: ['15', '19', '11', '14'], a: '19' }
+                    { q: '40 + 30 = ?', options: ['70', '60', '80', '10'], a: '70' },
+                    { q: '55 - 5 = ?', options: ['50', '45', '60', '5'], a: '50' },
+                    { q: '22 + 11 = ?', options: ['33', '22', '44', '11'], a: '33' },
+                    { q: '88 - 8 = ?', options: ['80', '70', '90', '8'], a: '80' },
+                    { q: '10 + 90 = ?', options: ['100', '80', '90', '110'], a: '100' },
+                    { q: '75 - 25 = ?', options: ['50', '40', '60', '100'], a: '50' },
+                    { q: '14 + 6 = ?', options: ['20', '18', '22', '10'], a: '20' },
+                    { q: '30 - 15 = ?', options: ['15', '20', '10', '25'], a: '15' },
+                    { q: '50 + 50 = ?', options: ['100', '90', '80', '110'], a: '100' },
+                    { q: '100 - 1 = ?', options: ['99', '101', '90', '98'], a: '99' }
                 ]
             },
             {
-                id: 'addition',
-                title: 'Addition Adventures',
-                icon: '➕',
-                color: 'bg-cyan-500',
+                id: 'ch8', title: 'Chapter 8: Time', icon: '⏰', color: 'bg-cyan-500',
                 learn: {
-                    concept: 'Addition is putting groups together to make a bigger group! We use the plus sign (+).',
-                    visual: '2 🍎 + 1 🍎 = 3 🍎',
-                    voiceText: 'Hi Jitya! Addition is like a party where everyone joins in. If you have two cookies and I give you one more, you have three cookies in total! Yum!'
+                    concept: 'Time tells us when things happen! Morning, Afternoon, Evening, and Night. Clocks show us hours and minutes.',
+                    voiceText: "Hi Jitya! Time is like a story. It starts in the morning when the sun comes up. Then it's afternoon, then evening, and finally night when we sleep. A clock has two hands to show us the time!"
                 },
                 practice: [
-                    { q: 'What is 2 + 2?', options: ['3', '4', '5', '6'], a: '4', help: 'Hold up 2 fingers on one hand and 2 on the other. Count them all together: 1, 2, 3, 4!' },
-                    { q: 'If you have 5 and add 0, what do you get?', options: ['0', '6', '5', '10'], a: '5', help: 'Adding zero means adding nothing! So the number stays the same.' }
+                    { q: 'When do we eat breakfast?', options: ['Morning', 'Night', 'Afternoon', 'Evening'], a: 'Morning', help: 'We start our day with breakfast.' },
+                    { q: 'Days in a week?', options: ['7', '5', '12', '30'], a: '7', help: 'Mon, Tue, Wed, Thu, Fri, Sat, Sun.' },
+                    { q: 'Month after January?', options: ['February', 'March', 'December', 'April'], a: 'February', help: 'Jan is 1st, Feb is 2nd.' },
+                    { q: 'What is in the sky at night?', options: ['Moon', 'Sun', 'Rainbow', 'Clouds'], a: 'Moon', help: 'The moon shines at night.' },
+                    { q: 'Short hand at 3, long at 12?', options: ['3 o\'clock', '12 o\'clock', '6 o\'clock', '9 o\'clock'], a: '3 o\'clock', help: 'Short hand shows the hour.' },
+                    { q: 'First day of the week?', options: ['Monday', 'Sunday', 'Friday', 'Saturday'], a: 'Monday', help: 'School starts on Monday.' },
+                    { q: 'Months in a year?', options: ['12', '7', '30', '365'], a: '12', help: 'Jan to Dec is 12 months.' },
+                    { q: 'When do stars appear?', options: ['Night', 'Morning', 'Noon', 'Afternoon'], a: 'Night', help: 'Stars come out when it is dark.' },
+                    { q: 'After Sunday comes?', options: ['Monday', 'Saturday', 'Tuesday', 'Friday'], a: 'Monday', help: 'The week starts again with Monday.' },
+                    { q: 'Month with fewest days?', options: ['February', 'May', 'August', 'October'], a: 'February', help: 'February has 28 or 29 days.' }
                 ],
                 test: [
-                    { q: '3 + 2 = ?', options: ['4', '5', '6', '7'], a: '5' },
-                    { q: '1 + 1 = ?', options: ['1', '2', '3', '0'], a: '2' },
-                    { q: '4 + 0 = ?', options: ['0', '4', '8', '40'], a: '4' },
-                    { q: '5 + 5 = ?', options: ['10', '11', '9', '15'], a: '10' },
-                    { q: '2 + 7 = ?', options: ['8', '9', '10', '7'], a: '9' }
+                    { q: '12 o\'clock noon is...', options: ['Daytime', 'Night', 'Morning', 'Evening'], a: 'Daytime' },
+                    { q: 'Last month of the year?', options: ['December', 'November', 'January', 'October'], a: 'December' },
+                    { q: 'Hours in a day?', options: ['24', '12', '60', '7'], a: '24' },
+                    { q: '3rd day of the week?', options: ['Wednesday', 'Tuesday', 'Thursday', 'Monday'], a: 'Wednesday' },
+                    { q: 'When do we go to school?', options: ['Morning', 'Night', 'Midnight', 'Evening'], a: 'Morning' },
+                    { q: 'Numbers on a clock face?', options: ['12', '10', '24', '60'], a: '12' },
+                    { q: 'Cold season?', options: ['Winter', 'Summer', 'Spring', 'Autumn'], a: 'Winter' },
+                    { q: 'Sat and Sun are the...', options: ['Weekend', 'Weekdays', 'Holidays', 'Mornings'], a: 'Weekend' },
+                    { q: 'Both hands at 12?', options: ['12 o\'clock', '6 o\'clock', 'Noon', 'Midnight'], a: '12 o\'clock' },
+                    { q: 'Month before July?', options: ['June', 'August', 'May', 'September'], a: 'June' }
                 ]
             },
             {
-                id: 'shapes',
-                title: 'Shapes All Around',
-                icon: '📐',
-                color: 'bg-yellow-500',
+                id: 'ch9', title: 'Chapter 9: Money', icon: '💰', color: 'bg-yellow-500',
                 learn: {
-                    concept: 'Shapes are the outlines of things! Circles are round, and squares have four straight sides.',
-                    visual: '🔴 Circle <br> 🟦 Square <br> 🔺 Triangle',
-                    voiceText: 'Hi Jitya! Look around your room. Is your clock a circle? Is your book a rectangle? Shapes are everywhere if you look closely!'
+                    concept: 'Money helps us buy things! We use coins and notes. In India, we use Rupees (₹).',
+                    voiceText: "Hi Jitya! Money is what we use at the shop. We have shiny coins and paper notes. In India, we use Rupees. Can you identify a 10 rupee note? It's great for buying treats!"
                 },
                 practice: [
-                    { q: 'Which shape has 3 sides?', options: ['Square', 'Circle', 'Triangle', 'Star'], a: 'Triangle', help: 'A triangle looks like a slice of pizza or a party hat. It has three pointy corners!' },
-                    { q: 'Is a ball a circle or a square?', options: ['Circle', 'Square', 'Triangle', 'Oval'], a: 'Circle', help: 'Balls are round and can roll. That makes them circles!' }
+                    { q: 'Symbol for Rupee?', options: ['₹', '$', '€', '£'], a: '₹', help: 'It looks like R with a line.' },
+                    { q: 'Which is a coin?', options: ['₹5 Coin', '₹10 Note', '₹100 Note', '₹2000 Note'], a: '₹5 Coin', help: 'Coins are round and metal.' },
+                    { q: '₹10 + ₹10 = ?', options: ['₹20', '₹10', '₹30', '₹100'], a: '₹20', help: '10 plus 10 is 20.' },
+                    { q: '₹20 - ₹15 = ?', options: ['₹5', '₹10', '₹15', '₹0'], a: '₹5', help: '20 take away 15 is 5.' },
+                    { q: 'Which is more?', options: ['₹100', '₹10', '₹20', '₹50'], a: '₹100', help: '100 is the biggest number here.' },
+                    { q: '₹1 coins for ₹5?', options: ['5', '1', '10', '2'], a: '5', help: 'You need five 1s.' },
+                    { q: '₹50 + ₹50 = ?', options: ['₹100', '₹50', '₹150', '₹200'], a: '₹100', help: '50 and 50 is 100.' },
+                    { q: 'No such note as...', options: ['₹30', '₹10', '₹20', '₹50'], a: '₹30', help: 'There is no 30 rupee note.' },
+                    { q: 'Candy ₹2, for 2 candies?', options: ['₹4', '₹2', '₹6', '₹10'], a: '₹4', help: '2 + 2 = 4.' },
+                    { q: '₹10 - ₹7 = ?', options: ['₹3', '₹7', '₹10', '₹5'], a: '₹3', help: '10 minus 7 is 3.' }
                 ],
                 test: [
-                    { q: 'How many sides does a square have?', options: ['3', '4', '5', '0'], a: '4' },
-                    { q: 'Which shape is round?', options: ['Square', 'Triangle', 'Circle', 'Rectangle'], a: 'Circle' },
-                    { q: 'A roof of a house is often a...', options: ['Circle', 'Square', 'Triangle', 'Star'], a: 'Triangle' },
-                    { q: 'A window is usually a...', options: ['Circle', 'Square', 'Triangle', 'Oval'], a: 'Square' },
-                    { q: 'Which shape has NO corners?', options: ['Square', 'Triangle', 'Circle', 'Rectangle'], a: 'Circle' }
+                    { q: '₹20 + ₹5 = ?', options: ['₹25', '₹20', '₹30', '₹15'], a: '₹25' },
+                    { q: 'Smallest coin value?', options: ['₹1', '₹2', '₹5', '₹10'], a: '₹1' },
+                    { q: '₹100 - ₹50 = ?', options: ['₹50', '₹40', '₹60', '₹100'], a: '₹50' },
+                    { q: '₹5 coins for ₹10?', options: ['2', '5', '1', '10'], a: '2' },
+                    { q: 'Pen ₹12, give ₹20. Change?', options: ['₹8', '₹10', '₹5', '₹12'], a: '₹8' },
+                    { q: '₹10 + ₹20 + ₹5 = ?', options: ['₹35', '₹30', '₹40', '₹25'], a: '₹35' },
+                    { q: 'Note that is orange?', options: ['₹200', '₹10', '₹50', '₹100'], a: '₹200' },
+                    { q: '₹5 + ₹2 + ₹1 = ?', options: ['₹8', '₹7', '₹9', '₹10'], a: '₹8' },
+                    { q: 'Buy ₹50 toy with ₹20?', options: ['No', 'Yes', 'Maybe', 'Only if red'], a: 'No' },
+                    { q: '₹10 + ₹10 + ₹10 = ?', options: ['₹30', '₹20', '₹40', '₹10'], a: '₹30' }
+                ]
+            },
+            {
+                id: 'ch10', title: 'Chapter 10: Measurement', icon: '📏', color: 'bg-green-500',
+                learn: {
+                    concept: 'Measurement helps us know how long, heavy, or full something is! Length, Weight, and Capacity.',
+                    voiceText: "Hi Jitya! Measurement is like being a detective. We use our hands to see how long a table is, or a scale to see if a pumpkin is heavy. Capacity is how much milk fits in your glass!"
+                },
+                practice: [
+                    { q: 'Which is longer?', options: ['Bus', 'Car', 'Cycle', 'Toy Car'], a: 'Bus', help: 'A bus is very big and long.' },
+                    { q: 'Which is heavier?', options: ['Elephant', 'Cat', 'Mouse', 'Bird'], a: 'Elephant', help: 'Elephants are the heaviest.' },
+                    { q: 'Holds more water?', options: ['Bucket', 'Cup', 'Spoon', 'Glass'], a: 'Bucket', help: 'A bucket is the biggest container.' },
+                    { q: 'Measure weight with?', options: ['Scale', 'Ruler', 'Clock', 'Thermometer'], a: 'Scale', help: 'Scales tell us weight.' },
+                    { q: 'Which is shorter?', options: ['Pencil', 'Tree', 'Ladder', 'Building'], a: 'Pencil', help: 'A pencil is small.' },
+                    { q: 'Feather is ________ than brick.', options: ['Lighter', 'Heavier', 'Longer', 'Thicker'], a: 'Lighter', help: 'Feathers are very light.' },
+                    { q: 'Least capacity?', options: ['Spoon', 'Bowl', 'Jug', 'Tank'], a: 'Spoon', help: 'Spoons are tiny.' },
+                    { q: 'Measure length with?', options: ['Handspan', 'Eyes', 'Ears', 'Nose'], a: 'Handspan', help: 'Handspan is a way to measure.' },
+                    { q: 'Which is taller?', options: ['Giraffe', 'Dog', 'Cat', 'Rabbit'], a: 'Giraffe', help: 'Giraffes have long necks.' },
+                    { q: 'Full bottle has ________ water.', options: ['More', 'Less', 'Same', 'Zero'], a: 'More', help: 'Full means lots of water.' }
+                ],
+                test: [
+                    { q: 'Longest?', options: ['Train', 'Bus', 'Car', 'Bicycle'], a: 'Train' },
+                    { q: 'Lightest?', options: ['Leaf', 'Stone', 'Book', 'Bag'], a: 'Leaf' },
+                    { q: 'Bathtub holds ________ than mug.', options: ['More', 'Less', 'Same', 'None'], a: 'More' },
+                    { q: 'Measure height?', options: ['Top to Bottom', 'Side to Side', 'Round', 'Inside'], a: 'Top to Bottom' },
+                    { q: '1kg iron vs 1kg cotton?', options: ['Same', 'Iron', 'Cotton', 'Neither'], a: 'Same' },
+                    { q: 'Ruler measures...', options: ['Length', 'Weight', 'Time', 'Temp'], a: 'Length' },
+                    { q: 'Shorter?', options: ['Centimeter', 'Meter', 'Kilometer', 'Mile'], a: 'Centimeter' },
+                    { q: 'Holds most milk?', options: ['Tanker', 'Packet', 'Bottle', 'Glass'], a: 'Tanker' },
+                    { q: 'Wider?', options: ['Road', 'Path', 'Line', 'Thread'], a: 'Road' },
+                    { q: 'Balloon heavier than ball?', options: ['No', 'Yes', 'Sometimes', 'Only red'], a: 'No' }
+                ]
+            },
+            {
+                id: 'ch11', title: 'Chapter 11: Data Handling', icon: '📊', color: 'bg-orange-500',
+                learn: {
+                    concept: 'Data handling is collecting and sorting things! We count and group items to understand them.',
+                    voiceText: "Hi Jitya! Data handling is like tidying your toys. We count dolls, cars, and blocks. Then we see which one you have the most of!"
+                },
+                practice: [
+                    { q: '3 red, 2 blue balls. How many red?', options: ['3', '2', '5', '0'], a: '3', help: 'Look for the red balls.' },
+                    { q: '🍎🍎🍌, which is more?', options: ['Apple', 'Banana', 'Orange', 'Grapes'], a: 'Apple', help: 'There are 2 apples.' },
+                    { q: 'Count: 🔺🔺🔺🔺', options: ['4', '3', '5', '2'], a: '4', help: 'One, two, three, four.' },
+                    { q: 'Sorting means...', options: ['Groups', 'Trash', 'Water', 'Fire'], a: 'Groups', help: 'Putting like things together.' },
+                    { q: '5 pizza, 2 pasta. More popular?', options: ['Pizza', 'Pasta', 'Both', 'Neither'], a: 'Pizza', help: '5 is more than 2.' },
+                    { q: 'Count: 🔴🔴🔴', options: ['3', '2', '4', '1'], a: '3', help: 'One, two, three.' },
+                    { q: 'Tally for 5?', options: ['IIII/', 'IIIII', 'V', 'X'], a: 'IIII/', help: '4 lines and a slash.' },
+                    { q: '10 toys, 4 cars. Not cars?', options: ['6', '4', '10', '14'], a: '6', help: '10 minus 4 is 6.' },
+                    { q: 'Most common in ⬛⬛🔴⬛?', options: ['Square', 'Circle', 'Triangle', 'Star'], a: 'Square', help: 'There are 3 squares.' },
+                    { q: 'Data means...', options: ['Information', 'Toys', 'Food', 'Sleep'], a: 'Information', help: 'Data is facts we collect.' }
+                ],
+                test: [
+                    { q: 'Count: ⭐⭐⭐⭐⭐⭐', options: ['6', '5', '7', '4'], a: '6' },
+                    { q: '8 birds, 3 fly away. Left?', options: ['5', '8', '3', '11'], a: '5' },
+                    { q: 'Least in 🍎🍎🍎🍌🍌?', options: ['Banana', 'Apple', 'Orange', 'Mango'], a: 'Banana' },
+                    { q: 'Chart with pictures?', options: ['Pictograph', 'Drawing', 'Map', 'Photo'], a: 'Pictograph' },
+                    { q: 'Sides of a triangle?', options: ['3', '4', '5', '0'], a: '3' },
+                    { q: '4 cats, 4 dogs. You have...', options: ['Same', 'More cats', 'More dogs', 'None'], a: 'Same' },
+                    { q: 'Count: ●●●●●', options: ['5', '4', '6', '3'], a: '5' },
+                    { q: 'Missing: 1, 2, _, 4, 5', options: ['3', '0', '6', '10'], a: '3' },
+                    { q: 'Sort by color, red and green are...', options: ['Different', 'Same', 'Small', 'Big'], a: 'Different' },
+                    { q: 'Data helps us...', options: ['Understand', 'Forget', 'Sleep', 'Eat'], a: 'Understand' }
+                ]
+            },
+            {
+                id: 'ch12', title: 'Chapter 12: Multiplication', icon: '✖️', color: 'bg-purple-500',
+                learn: {
+                    concept: 'Multiplication is adding the same number over and over! Shortcut for addition.',
+                    voiceText: "Hi Jitya! Multiplication is a shortcut. If you have 3 groups of 2 cookies, instead of 2+2+2, you say 3 times 2 is 6! It's like magic!"
+                },
+                practice: [
+                    { q: '2 + 2 + 2 = ?', options: ['6', '4', '8', '2'], a: '6', help: 'Count by twos: 2, 4, 6.' },
+                    { q: '2 times 3 is...', options: ['3 + 3', '2 + 2', '3 + 2', '2 + 3'], a: '3 + 3', help: 'Two groups of three.' },
+                    { q: 'Skip count: 2, 4, 6, _', options: ['8', '7', '10', '9'], a: '8', help: 'Add 2 more.' },
+                    { q: '5 + 5 = ?', options: ['2 times 5', '5 times 5', '10 times 5', '0 times 5'], a: '2 times 5', help: 'Two fives.' },
+                    { q: '10 times 1?', options: ['10', '1', '11', '0'], a: '10', help: 'Any number times 1 is itself.' },
+                    { q: '3 groups of 3?', options: ['9', '6', '3', '12'], a: '9', help: '3+3+3=9.' },
+                    { q: 'Skip count: 5, 10, 15, _', options: ['20', '16', '25', '30'], a: '20', help: 'Add 5 more.' },
+                    { q: '0 times 100?', options: ['0', '100', '1', '10'], a: '0', help: 'Times zero is always zero.' },
+                    { q: '4 times 2?', options: ['8', '6', '4', '10'], a: '8', help: '2+2+2+2=8.' },
+                    { q: '5 times 2?', options: ['10', '7', '5', '12'], a: '10', help: '5+5=10.' }
+                ],
+                test: [
+                    { q: '2 times 2 = ?', options: ['4', '2', '6', '8'], a: '4' },
+                    { q: '3 times 1 = ?', options: ['3', '1', '4', '0'], a: '3' },
+                    { q: '5 times 0 = ?', options: ['0', '5', '1', '10'], a: '0' },
+                    { q: 'Skip count: 10, 20, 30, _', options: ['40', '31', '50', '100'], a: '40' },
+                    { q: '2+2+2+2+2 = ?', options: ['5 times 2', '2 times 2', '10 times 2', '1 times 2'], a: '5 times 2' },
+                    { q: '3 times 2?', options: ['6', '5', '3', '9'], a: '6' },
+                    { q: '4 times 1?', options: ['4', '1', '5', '0'], a: '4' },
+                    { q: '2 times 5?', options: ['10', '7', '5', '12'], a: '10' },
+                    { q: 'Skip count: 10, 12, 14, _', options: ['16', '15', '18', '20'], a: '16' },
+                    { q: '1 times 1?', options: ['1', '2', '0', '11'], a: '1' }
                 ]
             }
         ];
 
         let state = {
-            view: 'home', // home, modules, learn, practice, test, results
-            selectedChapter: null,
-            currentQuestionIndex: 0,
-            score: 0,
-            selectedAnswer: null,
-            isCorrect: null,
-            quizQuestions: []
+            view: 'home', selectedChapter: null, currentQuestionIndex: 0, score: 0,
+            selectedAnswer: null, isCorrect: null, quizQuestions: [],
+            completedChapters: JSON.parse(localStorage.getItem('jitya_math_progress') || '{}')
         };
 
-        function goHome() {
-            state.view = 'home';
-            state.selectedChapter = null;
-            render();
-        }
-
-        function selectChapter(chapterId) {
-            state.selectedChapter = MATH_CURRICULUM.find(c => c.id === chapterId);
-            state.view = 'modules';
-            render();
-        }
-
-        function startModule(moduleType) {
-            state.view = moduleType;
-            state.currentQuestionIndex = 0;
-            state.score = 0;
-            state.selectedAnswer = null;
-            state.isCorrect = null;
-            if (moduleType === 'test') {
-                state.quizQuestions = [...state.selectedChapter.test];
-            }
-            render();
+        function saveProgress(id) {
+            state.completedChapters[id] = true;
+            localStorage.setItem('jitya_math_progress', JSON.stringify(state.completedChapters));
+            renderHeaderStats();
         }
 
         function speak(text) {
             window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.pitch = 1.2;
-            utterance.rate = 0.9;
-            window.speechSynthesis.speak(utterance);
+            const u = new SpeechSynthesisUtterance(text);
+            u.pitch = 1.2; u.rate = 0.9;
+            window.speechSynthesis.speak(u);
         }
 
-        function handleAnswer(answer, isTest = false) {
+        function goHome() { state.view = 'home'; state.selectedChapter = null; render(); }
+        function selectChapter(id) { state.selectedChapter = MATH_CURRICULUM.find(c => c.id === id); state.view = 'modules'; render(); }
+        function startModule(type) {
+            state.view = type; state.currentQuestionIndex = 0; state.score = 0;
+            state.selectedAnswer = null; state.isCorrect = null;
+            state.quizQuestions = type === 'test' ? [...state.selectedChapter.test] : [...state.selectedChapter.practice];
+            render();
+        }
+
+        function handleAnswer(ans, isTest) {
             if (state.selectedAnswer) return;
-            state.selectedAnswer = answer;
-            const question = isTest ? state.quizQuestions[state.currentQuestionIndex] : state.selectedChapter.practice[state.currentQuestionIndex];
-            state.isCorrect = answer === question.a;
-            
+            state.selectedAnswer = ans;
+            const q = state.quizQuestions[state.currentQuestionIndex];
+            state.isCorrect = ans === q.a;
             if (state.isCorrect) {
                 state.score++;
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+                if (!isTest) confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
             }
             render();
         }
 
-        function nextQuestion(isTest = false) {
-            const questions = isTest ? state.quizQuestions : state.selectedChapter.practice;
-            if (state.currentQuestionIndex < questions.length - 1) {
-                state.currentQuestionIndex++;
-                state.selectedAnswer = null;
-                state.isCorrect = null;
-                render();
-            } else if (isTest) {
-                state.view = 'results';
-                if ((state.score / questions.length) >= 0.8) {
-                    confetti({ particleCount: 200, spread: 100, origin: { y: 0.5 } });
-                }
-                render();
+        function nextQuestion(isTest) {
+            if (state.currentQuestionIndex < state.quizQuestions.length - 1) {
+                state.currentQuestionIndex++; state.selectedAnswer = null; state.isCorrect = null; render();
             } else {
-                state.view = 'modules';
+                if (isTest) {
+                    state.view = 'results';
+                    if ((state.score / state.quizQuestions.length) >= 0.8) {
+                        saveProgress(state.selectedChapter.id);
+                        confetti({ particleCount: 200, spread: 100, origin: { y: 0.5 } });
+                    }
+                } else { state.view = 'modules'; }
                 render();
             }
         }
 
+        function renderHeaderStats() {
+            const count = Object.keys(state.completedChapters).length;
+            document.getElementById('header-stats').innerHTML = `
+                <div class="bg-white/30 backdrop-blur-md px-4 py-2 rounded-full border border-white/40 flex items-center gap-2">
+                    <span class="text-yellow-200">⭐</span>
+                    <span class="font-bold text-white">${count} / ${MATH_CURRICULUM.length} Done</span>
+                </div>
+            `;
+        }
+
         function render() {
             const container = document.getElementById('app-content');
+            renderHeaderStats();
             
             if (state.view === 'home') {
                 container.innerHTML = `
                     <div class="space-y-8">
-                        <section class="bg-white rounded-3xl p-8 shadow-xl border-4 border-pink-100 text-center md:text-left flex flex-col md:flex-row items-center gap-8">
+                        <section class="bg-white rounded-3xl p-8 shadow-xl border-4 border-pink-100 flex flex-col md:flex-row items-center gap-8">
                             <div class="w-32 h-32 bg-cyan-100 rounded-full flex items-center justify-center border-4 border-cyan-200 overflow-hidden shrink-0">
-                                <img src="https://picsum.photos/seed/kid/200/200" alt="Jitya" class="w-full h-full object-cover">
+                                <img src="https://picsum.photos/seed/jitya/200/200" alt="Jitya" class="w-full h-full object-cover">
                             </div>
-                            <div>
-                                <h2 class="text-4xl font-black text-slate-800">Hi <span class="text-pink-500">Jitya!</span></h2>
-                                <p class="text-xl text-slate-500 font-medium">Ready for your Math Adventure today? Pick a chapter to start!</p>
+                            <div class="flex-1">
+                                <h2 class="text-4xl font-black text-slate-800 italic">Hi Jitya!</h2>
+                                <p class="text-xl text-slate-500 font-medium">Ready to conquer Math today? Pick a chapter to start!</p>
                             </div>
                         </section>
-
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            ${MATH_CURRICULUM.map(chapter => `
-                                <button onclick="selectChapter('${chapter.id}')" class="group bg-white p-8 rounded-3xl shadow-lg border-b-8 border-slate-200 hover:border-cyan-400 hover:-translate-y-2 transition-all text-center space-y-4">
-                                    <div class="text-6xl group-hover:scale-110 transition-transform">${chapter.icon}</div>
-                                    <h3 class="text-2xl font-black text-slate-700">${chapter.title}</h3>
-                                    <div class="inline-block px-4 py-1 rounded-full bg-slate-100 text-slate-500 font-bold text-sm">Grade 1</div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            ${MATH_CURRICULUM.map(c => `
+                                <button onclick="selectChapter('${c.id}')" class="group relative bg-white p-8 rounded-3xl shadow-lg border-b-8 border-slate-200 hover:border-cyan-400 hover:-translate-y-2 transition-all text-left space-y-4 overflow-hidden">
+                                    ${state.completedChapters[c.id] ? '<div class="absolute top-4 right-4 bg-green-500 text-white p-1 rounded-full shadow-lg text-xs">✅</div>' : ''}
+                                    <div class="text-6xl group-hover:scale-110 transition-transform">${c.icon}</div>
+                                    <h3 class="text-2xl font-black text-slate-700 leading-tight">${c.title}</h3>
+                                    <div class="flex items-center justify-between text-cyan-500 font-black text-sm">START ➔</div>
                                 </button>
                             `).join('')}
                         </div>
@@ -230,28 +323,21 @@
             } else if (state.view === 'modules') {
                 container.innerHTML = `
                     <div class="space-y-8">
-                        <button onclick="goHome()" class="flex items-center gap-2 text-slate-500 font-bold hover:text-pink-500 transition-colors">
-                            <span>⬅️</span> Back to Index
-                        </button>
+                        <button onclick="goHome()" class="flex items-center gap-2 text-slate-500 font-bold hover:text-pink-500 transition-colors bounce-hover">⬅️ Back to Dashboard</button>
                         <div class="bg-white rounded-3xl p-8 shadow-xl border-4 border-cyan-100 text-center space-y-4">
-                            <div class="text-6xl">${state.selectedChapter.icon}</div>
+                            <div class="text-7xl float-animation">${state.selectedChapter.icon}</div>
                             <h2 class="text-4xl font-black text-slate-800">${state.selectedChapter.title}</h2>
+                            <button onclick="speak('Hi Jitya! Welcome to ${state.selectedChapter.title}. Pick a module to start learning!')" class="bg-slate-100 text-slate-600 px-4 py-2 rounded-full font-bold flex items-center gap-2 mx-auto hover:bg-slate-200">👩‍🏫 Hear Teacher</button>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <button onclick="startModule('learn')" class="bg-white p-8 rounded-3xl shadow-lg border-b-8 border-pink-200 hover:border-pink-400 hover:-translate-y-1 transition-all text-center space-y-2">
-                                <div class="text-4xl">📖</div>
-                                <h3 class="text-xl font-black text-pink-600">1. Learn</h3>
-                                <p class="text-slate-500 font-medium">Watch and Listen</p>
+                                <div class="text-4xl">📖</div><h3 class="text-xl font-black text-pink-600">1. Learn</h3><p class="text-slate-500 font-medium">Watch and Listen</p>
                             </button>
                             <button onclick="startModule('practice')" class="bg-white p-8 rounded-3xl shadow-lg border-b-8 border-yellow-200 hover:border-yellow-400 hover:-translate-y-1 transition-all text-center space-y-2">
-                                <div class="text-4xl">📝</div>
-                                <h3 class="text-xl font-black text-yellow-600">2. Practice</h3>
-                                <p class="text-slate-500 font-medium">Fun Worksheets</p>
+                                <div class="text-4xl">📝</div><h3 class="text-xl font-black text-yellow-600">2. Practice</h3><p class="text-slate-500 font-medium">Fun Worksheets</p>
                             </button>
                             <button onclick="startModule('test')" class="bg-white p-8 rounded-3xl shadow-lg border-b-8 border-cyan-200 hover:border-cyan-400 hover:-translate-y-1 transition-all text-center space-y-2">
-                                <div class="text-4xl">🏆</div>
-                                <h3 class="text-xl font-black text-cyan-600">3. Test</h3>
-                                <p class="text-slate-500 font-medium">Final Challenge</p>
+                                <div class="text-4xl">🏆</div><h3 class="text-xl font-black text-cyan-600">3. Test</h3><p class="text-slate-500 font-medium">Final Challenge</p>
                             </button>
                         </div>
                     </div>
@@ -259,20 +345,14 @@
             } else if (state.view === 'learn') {
                 container.innerHTML = `
                     <div class="space-y-8">
-                        <button onclick="startModule('modules')" class="flex items-center gap-2 text-slate-500 font-bold hover:text-pink-500 transition-colors">
-                            <span>⬅️</span> Back to Chapter
-                        </button>
+                        <button onclick="selectChapter('${state.selectedChapter.id}')" class="flex items-center gap-2 text-slate-500 font-bold hover:text-pink-500 transition-colors">⬅️ Back to Chapter</button>
                         <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border-4 border-pink-100">
-                            <div class="bg-pink-500 p-6 flex items-center justify-between">
-                                <h3 class="text-2xl font-black text-white">Learning Time!</h3>
-                                <button onclick="speak('${state.selectedChapter.learn.voiceText}')" class="bg-white text-pink-500 px-4 py-2 rounded-full font-black flex items-center gap-2 hover:bg-pink-50 transition-colors">
-                                    <span>🔊</span> Play Voice
-                                </button>
+                            <div class="bg-pink-500 p-6 flex items-center justify-between text-white">
+                                <h3 class="text-2xl font-black">Learning Time!</h3>
+                                <button onclick="speak('${state.selectedChapter.learn.voiceText}')" class="bg-white text-pink-500 px-6 py-3 rounded-full font-black flex items-center gap-2 shadow-md bounce-hover">🔊 Hear Teacher</button>
                             </div>
                             <div class="p-12 text-center space-y-12">
-                                <div class="space-y-4">
-                                    <p class="text-3xl font-bold text-slate-700 leading-relaxed">${state.selectedChapter.learn.concept}</p>
-                                </div>
+                                <p class="text-3xl font-bold text-slate-700 leading-relaxed">${state.selectedChapter.learn.concept}</p>
                                 <div class="bg-slate-50 p-12 rounded-3xl border-4 border-dashed border-slate-200 inline-block">
                                     <p class="text-6xl font-black text-pink-500">${state.selectedChapter.learn.visual}</p>
                                 </div>
@@ -280,27 +360,29 @@
                         </div>
                     </div>
                 `;
-            } else if (state.view === 'practice') {
-                const q = state.selectedChapter.practice[state.currentQuestionIndex];
+            } else if (state.view === 'practice' || state.view === 'test') {
+                const isTest = state.view === 'test';
+                const q = state.quizQuestions[state.currentQuestionIndex];
                 container.innerHTML = `
                     <div class="space-y-8">
-                        <button onclick="startModule('modules')" class="flex items-center gap-2 text-slate-500 font-bold hover:text-pink-500 transition-colors">
-                            <span>⬅️</span> Back to Chapter
-                        </button>
-                        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border-4 border-yellow-100">
-                            <div class="bg-yellow-500 p-6 flex items-center justify-between">
-                                <h3 class="text-2xl font-black text-white">Practice Worksheet</h3>
-                                <button onclick="speak('${q.help}')" class="bg-white text-yellow-600 px-4 py-2 rounded-full font-black flex items-center gap-2 hover:bg-yellow-50 transition-colors">
-                                    <span>💡</span> Help
+                        <div class="flex items-center justify-between">
+                            <button onclick="selectChapter('${state.selectedChapter.id}')" class="flex items-center gap-2 text-slate-500 font-bold hover:text-pink-500 transition-colors">⬅️ Quit</button>
+                            <div class="bg-white px-4 py-2 rounded-full border-2 border-slate-100 font-black text-slate-600">Task ${state.currentQuestionIndex + 1} of ${state.quizQuestions.length}</div>
+                        </div>
+                        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border-4 ${isTest ? 'border-cyan-100' : 'border-yellow-100'}">
+                            <div class="${isTest ? 'bg-cyan-500' : 'bg-yellow-500'} p-6 flex items-center justify-between text-white">
+                                <h3 class="text-2xl font-black">${isTest ? 'Final Assessment' : 'Interactive Worksheet'}</h3>
+                                <button onclick="speak('${isTest ? q.q : q.help}')" class="bg-white ${isTest ? 'text-cyan-600' : 'text-yellow-600'} px-6 py-3 rounded-full font-black flex items-center gap-2 shadow-md bounce-hover">
+                                    ${isTest ? '🔊 Hear Question' : '💡 Verbal Help'}
                                 </button>
                             </div>
                             <div class="p-8 space-y-8">
                                 <div class="bg-slate-50 p-8 rounded-2xl border-2 border-slate-100 text-center">
                                     <p class="text-3xl font-black text-slate-700">${q.q}</p>
                                 </div>
-                                <div class="grid grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     ${q.options.map(opt => `
-                                        <button onclick="handleAnswer('${opt}')" ${state.selectedAnswer ? 'disabled' : ''} class="p-6 rounded-2xl text-2xl font-black transition-all border-b-4 ${state.selectedAnswer === opt ? (state.isCorrect ? 'bg-green-500 text-white border-green-700' : 'bg-red-500 text-white border-red-700') : 'bg-white text-slate-700 border-slate-200 hover:border-yellow-400 hover:bg-yellow-50'}">
+                                        <button onclick="handleAnswer('${opt}', ${isTest})" ${state.selectedAnswer ? 'disabled' : ''} class="p-6 rounded-2xl text-2xl font-black transition-all border-b-4 ${state.selectedAnswer === opt ? (state.isCorrect ? 'bg-green-500 text-white border-green-700' : 'bg-red-500 text-white border-red-700') : 'bg-white text-slate-700 border-slate-200 hover:border-cyan-400 hover:bg-cyan-50'}">
                                             ${opt}
                                         </button>
                                     `).join('')}
@@ -308,51 +390,17 @@
                                 ${state.selectedAnswer ? `
                                     <div class="p-6 rounded-2xl bg-slate-50 border-2 border-slate-100 space-y-4">
                                         <p class="text-xl font-bold ${state.isCorrect ? 'text-green-600' : 'text-red-600'}">${state.isCorrect ? 'Correct! 🌟' : 'Try again next time!'}</p>
-                                        <p class="text-lg text-slate-600">${q.help}</p>
-                                        <button onclick="nextQuestion()" class="w-full bg-yellow-500 text-white py-4 rounded-2xl font-black text-xl shadow-lg border-b-4 border-yellow-700">Next Question</button>
+                                        ${!isTest ? `<p class="text-lg text-slate-600">${q.help}</p>` : ''}
+                                        <button onclick="nextQuestion(${isTest})" class="w-full ${isTest ? 'bg-cyan-500' : 'bg-yellow-500'} text-white py-4 rounded-2xl font-black text-xl shadow-lg border-b-4 border-slate-700 bounce-hover">Next</button>
                                     </div>
                                 ` : ''}
                             </div>
                         </div>
                     </div>
                 `;
-            } else if (state.view === 'test') {
-                const q = state.quizQuestions[state.currentQuestionIndex];
-                container.innerHTML = `
-                    <div class="space-y-8">
-                        <div class="flex items-center justify-between">
-                            <button onclick="startModule('modules')" class="flex items-center gap-2 text-slate-500 font-bold hover:text-pink-500 transition-colors">
-                                <span>⬅️</span> Quit Test
-                            </button>
-                            <div class="bg-white px-4 py-2 rounded-full border-2 border-cyan-100 font-black text-cyan-600">
-                                Question ${state.currentQuestionIndex + 1} of ${state.quizQuestions.length}
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border-4 border-cyan-100">
-                            <div class="bg-cyan-500 p-6">
-                                <h3 class="text-2xl font-black text-white">Final Assessment</h3>
-                            </div>
-                            <div class="p-8 space-y-8">
-                                <div class="bg-slate-50 p-8 rounded-2xl border-2 border-slate-100 text-center">
-                                    <p class="text-3xl font-black text-slate-700">${q.q}</p>
-                                </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    ${q.options.map(opt => `
-                                        <button onclick="handleAnswer('${opt}', true)" ${state.selectedAnswer ? 'disabled' : ''} class="p-6 rounded-2xl text-2xl font-black transition-all border-b-4 ${state.selectedAnswer === opt ? (state.isCorrect ? 'bg-green-500 text-white border-green-700' : 'bg-red-500 text-white border-red-700') : 'bg-white text-slate-700 border-slate-200 hover:border-cyan-400 hover:bg-cyan-50'}">
-                                            ${opt}
-                                        </button>
-                                    `).join('')}
-                                </div>
-                                ${state.selectedAnswer ? `
-                                    <button onclick="nextQuestion(true)" class="w-full bg-cyan-500 text-white py-4 rounded-2xl font-black text-xl shadow-lg border-b-4 border-cyan-700">Continue</button>
-                                ` : ''}
-                            </div>
-                        </div>
-                    </div>
-                `;
             } else if (state.view === 'results') {
-                const percentage = (state.score / state.quizQuestions.length) * 100;
-                const isPass = percentage >= 80;
+                const p = (state.score / state.quizQuestions.length) * 100;
+                const isPass = p >= 80;
                 container.innerHTML = `
                     <div class="bg-white rounded-3xl p-12 shadow-2xl border-4 ${isPass ? 'border-green-100' : 'border-slate-100'} text-center space-y-8">
                         <div class="text-8xl">${isPass ? '🏆' : '💪'}</div>
@@ -360,18 +408,16 @@
                             <h2 class="text-5xl font-black text-slate-800">${isPass ? 'Amazing Job, Jitya!' : 'Good Effort!'}</h2>
                             <p class="text-2xl text-slate-500 font-medium">You scored ${state.score} out of ${state.quizQuestions.length}</p>
                         </div>
-                        <div class="text-6xl font-black ${isPass ? 'text-green-500' : 'text-slate-400'}">${percentage}%</div>
+                        <div class="text-6xl font-black ${isPass ? 'text-green-500' : 'text-slate-400'}">${p}%</div>
                         <div class="flex flex-col gap-4">
-                            <button onclick="startModule('test')" class="bg-cyan-500 text-white py-4 rounded-2xl font-black text-xl shadow-lg border-b-4 border-cyan-700">Try Again</button>
-                            <button onclick="goHome()" class="bg-white text-slate-500 py-4 rounded-2xl font-black text-xl border-2 border-slate-200">Back to Index</button>
+                            <button onclick="startModule('test')" class="bg-cyan-500 text-white py-4 rounded-2xl font-black text-xl shadow-lg border-b-4 border-cyan-700 bounce-hover">Try Again</button>
+                            <button onclick="goHome()" class="bg-white text-slate-500 py-4 rounded-2xl font-black text-xl border-2 border-slate-200 bounce-hover">Back to Dashboard</button>
                         </div>
                     </div>
                 `;
             }
         }
-
         render();
     </script>
 </body>
 </html>
-
