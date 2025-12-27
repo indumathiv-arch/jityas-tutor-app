@@ -1,13 +1,377 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KidTutor: Jitya's Math Adventure</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .bounce-hover { transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .bounce-hover:hover { transform: scale(1.05); }
+        .tap-active:active { transform: scale(0.95); }
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+        .float-animation { animation: float 4s ease-in-out infinite; }
+        .card-gradient { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); }
+    </style>
+</head>
+<body class="bg-amber-50 min-h-screen pb-12 text-slate-800">
+    <!-- Colorful Header -->
+    <header class="bg-gradient-to-r from-pink-400 via-yellow-400 to-cyan-400 p-6 shadow-lg sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="goHome()">
+                <div class="bg-white p-2 rounded-2xl shadow-md">
+                    <svg class="w-8 h-8 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path>
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-black text-white tracking-tight drop-shadow-sm">KidTutor</h1>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 bg-white/30 backdrop-blur-md px-4 py-2 rounded-full border border-white/40">
+                    <span class="text-yellow-200">⭐</span>
+                    <span class="font-bold text-white">Math Whiz</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 mt-8">
+        <div id="app-content">
+            <!-- Content will be injected by JavaScript -->
+        </div>
+    </main>
+
+    <footer class="mt-12 text-center text-slate-400 font-medium">
+        <p>© 2025 KidTutor • Making Learning Fun for Jitya! ✨</p>
+    </footer>
+
+    <script>
+        const MATH_CURRICULUM = [
+            {
+                id: 'counting',
+                title: 'Counting to 20',
+                icon: '🔢',
+                color: 'bg-pink-500',
+                learn: {
+                    concept: 'Counting is finding out how many things are in a group! We start at 1 and go up one by one.',
+                    visual: '🍎 🍎 🍎 🍎 🍎 <br> 1, 2, 3, 4, 5!',
+                    voiceText: 'Hi Jitya! Let\'s learn to count. Counting is like climbing a ladder. We start at one, then two, then three! Can you count your favorite toys with me?'
+                },
+                practice: [
+                    { q: 'What number comes right after 12?', options: ['11', '13', '14', '10'], a: '13', help: 'Start at 10 and count up: 10, 11, 12... the next number is 13!' },
+                    { q: 'How many stars are here? ⭐⭐⭐', options: ['2', '4', '3', '5'], a: '3', help: 'Point to each star and say the numbers: one, two, three!' }
+                ],
+                test: [
+                    { q: 'What is 10 + 5?', options: ['12', '15', '18', '20'], a: '15' },
+                    { q: 'Which number is smaller than 8?', options: ['10', '12', '5', '9'], a: '5' },
+                    { q: 'Count the dots: ●●●●', options: ['3', '4', '5', '6'], a: '4' },
+                    { q: 'What comes before 20?', options: ['18', '21', '19', '17'], a: '19' },
+                    { q: 'Which is the biggest number?', options: ['15', '19', '11', '14'], a: '19' }
+                ]
+            },
+            {
+                id: 'addition',
+                title: 'Addition Adventures',
+                icon: '➕',
+                color: 'bg-cyan-500',
+                learn: {
+                    concept: 'Addition is putting groups together to make a bigger group! We use the plus sign (+).',
+                    visual: '2 🍎 + 1 🍎 = 3 🍎',
+                    voiceText: 'Hi Jitya! Addition is like a party where everyone joins in. If you have two cookies and I give you one more, you have three cookies in total! Yum!'
+                },
+                practice: [
+                    { q: 'What is 2 + 2?', options: ['3', '4', '5', '6'], a: '4', help: 'Hold up 2 fingers on one hand and 2 on the other. Count them all together: 1, 2, 3, 4!' },
+                    { q: 'If you have 5 and add 0, what do you get?', options: ['0', '6', '5', '10'], a: '5', help: 'Adding zero means adding nothing! So the number stays the same.' }
+                ],
+                test: [
+                    { q: '3 + 2 = ?', options: ['4', '5', '6', '7'], a: '5' },
+                    { q: '1 + 1 = ?', options: ['1', '2', '3', '0'], a: '2' },
+                    { q: '4 + 0 = ?', options: ['0', '4', '8', '40'], a: '4' },
+                    { q: '5 + 5 = ?', options: ['10', '11', '9', '15'], a: '10' },
+                    { q: '2 + 7 = ?', options: ['8', '9', '10', '7'], a: '9' }
+                ]
+            },
+            {
+                id: 'shapes',
+                title: 'Shapes All Around',
+                icon: '📐',
+                color: 'bg-yellow-500',
+                learn: {
+                    concept: 'Shapes are the outlines of things! Circles are round, and squares have four straight sides.',
+                    visual: '🔴 Circle <br> 🟦 Square <br> 🔺 Triangle',
+                    voiceText: 'Hi Jitya! Look around your room. Is your clock a circle? Is your book a rectangle? Shapes are everywhere if you look closely!'
+                },
+                practice: [
+                    { q: 'Which shape has 3 sides?', options: ['Square', 'Circle', 'Triangle', 'Star'], a: 'Triangle', help: 'A triangle looks like a slice of pizza or a party hat. It has three pointy corners!' },
+                    { q: 'Is a ball a circle or a square?', options: ['Circle', 'Square', 'Triangle', 'Oval'], a: 'Circle', help: 'Balls are round and can roll. That makes them circles!' }
+                ],
+                test: [
+                    { q: 'How many sides does a square have?', options: ['3', '4', '5', '0'], a: '4' },
+                    { q: 'Which shape is round?', options: ['Square', 'Triangle', 'Circle', 'Rectangle'], a: 'Circle' },
+                    { q: 'A roof of a house is often a...', options: ['Circle', 'Square', 'Triangle', 'Star'], a: 'Triangle' },
+                    { q: 'A window is usually a...', options: ['Circle', 'Square', 'Triangle', 'Oval'], a: 'Square' },
+                    { q: 'Which shape has NO corners?', options: ['Square', 'Triangle', 'Circle', 'Rectangle'], a: 'Circle' }
+                ]
+            }
+        ];
+
+        let state = {
+            view: 'home', // home, modules, learn, practice, test, results
+            selectedChapter: null,
+            currentQuestionIndex: 0,
+            score: 0,
+            selectedAnswer: null,
+            isCorrect: null,
+            quizQuestions: []
+        };
+
+        function goHome() {
+            state.view = 'home';
+            state.selectedChapter = null;
+            render();
+        }
+
+        function selectChapter(chapterId) {
+            state.selectedChapter = MATH_CURRICULUM.find(c => c.id === chapterId);
+            state.view = 'modules';
+            render();
+        }
+
+        function startModule(moduleType) {
+            state.view = moduleType;
+            state.currentQuestionIndex = 0;
+            state.score = 0;
+            state.selectedAnswer = null;
+            state.isCorrect = null;
+            if (moduleType === 'test') {
+                state.quizQuestions = [...state.selectedChapter.test];
+            }
+            render();
+        }
+
+        function speak(text) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.pitch = 1.2;
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function handleAnswer(answer, isTest = false) {
+            if (state.selectedAnswer) return;
+            state.selectedAnswer = answer;
+            const question = isTest ? state.quizQuestions[state.currentQuestionIndex] : state.selectedChapter.practice[state.currentQuestionIndex];
+            state.isCorrect = answer === question.a;
+            
+            if (state.isCorrect) {
+                state.score++;
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            }
+            render();
+        }
+
+        function nextQuestion(isTest = false) {
+            const questions = isTest ? state.quizQuestions : state.selectedChapter.practice;
+            if (state.currentQuestionIndex < questions.length - 1) {
+                state.currentQuestionIndex++;
+                state.selectedAnswer = null;
+                state.isCorrect = null;
+                render();
+            } else if (isTest) {
+                state.view = 'results';
+                if ((state.score / questions.length) >= 0.8) {
+                    confetti({ particleCount: 200, spread: 100, origin: { y: 0.5 } });
+                }
+                render();
+            } else {
+                state.view = 'modules';
+                render();
+            }
+        }
+
+        function render() {
+            const container = document.getElementById('app-content');
+            
+            if (state.view === 'home') {
+                container.innerHTML = `
+                    <div class="space-y-8">
+                        <section class="bg-white rounded-3xl p-8 shadow-xl border-4 border-pink-100 text-center md:text-left flex flex-col md:flex-row items-center gap-8">
+                            <div class="w-32 h-32 bg-cyan-100 rounded-full flex items-center justify-center border-4 border-cyan-200 overflow-hidden shrink-0">
+                                <img src="https://picsum.photos/seed/kid/200/200" alt="Jitya" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <h2 class="text-4xl font-black text-slate-800">Hi <span class="text-pink-500">Jitya!</span></h2>
+                                <p class="text-xl text-slate-500 font-medium">Ready for your Math Adventure today? Pick a chapter to start!</p>
+                            </div>
+                        </section>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            ${MATH_CURRICULUM.map(chapter => `
+                                <button onclick="selectChapter('${chapter.id}')" class="group bg-white p-8 rounded-3xl shadow-lg border-b-8 border-slate-200 hover:border-cyan-400 hover:-translate-y-2 transition-all text-center space-y-4">
+                                    <div class="text-6xl group-hover:scale-110 transition-transform">${chapter.icon}</div>
+                                    <h3 class="text-2xl font-black text-slate-700">${chapter.title}</h3>
+                                    <div class="inline-block px-4 py-1 rounded-full bg-slate-100 text-slate-500 font-bold text-sm">Grade 1</div>
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else if (state.view === 'modules') {
+                container.innerHTML = `
+                    <div class="space-y-8">
+                        <button onclick="goHome()" class="flex items-center gap-2 text-slate-500 font-bold hover:text-pink-500 transition-colors">
+                            <span>⬅️</span> Back to Index
+                        </button>
+                        <div class="bg-white rounded-3xl p-8 shadow-xl border-4 border-cyan-100 text-center space-y-4">
+                            <div class="text-6xl">${state.selectedChapter.icon}</div>
+                            <h2 class="text-4xl font-black text-slate-800">${state.selectedChapter.title}</h2>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <button onclick="startModule('learn')" class="bg-white p-8 rounded-3xl shadow-lg border-b-8 border-pink-200 hover:border-pink-400 hover:-translate-y-1 transition-all text-center space-y-2">
+                                <div class="text-4xl">📖</div>
+                                <h3 class="text-xl font-black text-pink-600">1. Learn</h3>
+                                <p class="text-slate-500 font-medium">Watch and Listen</p>
+                            </button>
+                            <button onclick="startModule('practice')" class="bg-white p-8 rounded-3xl shadow-lg border-b-8 border-yellow-200 hover:border-yellow-400 hover:-translate-y-1 transition-all text-center space-y-2">
+                                <div class="text-4xl">📝</div>
+                                <h3 class="text-xl font-black text-yellow-600">2. Practice</h3>
+                                <p class="text-slate-500 font-medium">Fun Worksheets</p>
+                            </button>
+                            <button onclick="startModule('test')" class="bg-white p-8 rounded-3xl shadow-lg border-b-8 border-cyan-200 hover:border-cyan-400 hover:-translate-y-1 transition-all text-center space-y-2">
+                                <div class="text-4xl">🏆</div>
+                                <h3 class="text-xl font-black text-cyan-600">3. Test</h3>
+                                <p class="text-slate-500 font-medium">Final Challenge</p>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else if (state.view === 'learn') {
+                container.innerHTML = `
+                    <div class="space-y-8">
+                        <button onclick="startModule('modules')" class="flex items-center gap-2 text-slate-500 font-bold hover:text-pink-500 transition-colors">
+                            <span>⬅️</span> Back to Chapter
+                        </button>
+                        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border-4 border-pink-100">
+                            <div class="bg-pink-500 p-6 flex items-center justify-between">
+                                <h3 class="text-2xl font-black text-white">Learning Time!</h3>
+                                <button onclick="speak('${state.selectedChapter.learn.voiceText}')" class="bg-white text-pink-500 px-4 py-2 rounded-full font-black flex items-center gap-2 hover:bg-pink-50 transition-colors">
+                                    <span>🔊</span> Play Voice
+                                </button>
+                            </div>
+                            <div class="p-12 text-center space-y-12">
+                                <div class="space-y-4">
+                                    <p class="text-3xl font-bold text-slate-700 leading-relaxed">${state.selectedChapter.learn.concept}</p>
+                                </div>
+                                <div class="bg-slate-50 p-12 rounded-3xl border-4 border-dashed border-slate-200 inline-block">
+                                    <p class="text-6xl font-black text-pink-500">${state.selectedChapter.learn.visual}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (state.view === 'practice') {
+                const q = state.selectedChapter.practice[state.currentQuestionIndex];
+                container.innerHTML = `
+                    <div class="space-y-8">
+                        <button onclick="startModule('modules')" class="flex items-center gap-2 text-slate-500 font-bold hover:text-pink-500 transition-colors">
+                            <span>⬅️</span> Back to Chapter
+                        </button>
+                        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border-4 border-yellow-100">
+                            <div class="bg-yellow-500 p-6 flex items-center justify-between">
+                                <h3 class="text-2xl font-black text-white">Practice Worksheet</h3>
+                                <button onclick="speak('${q.help}')" class="bg-white text-yellow-600 px-4 py-2 rounded-full font-black flex items-center gap-2 hover:bg-yellow-50 transition-colors">
+                                    <span>💡</span> Help
+                                </button>
+                            </div>
+                            <div class="p-8 space-y-8">
+                                <div class="bg-slate-50 p-8 rounded-2xl border-2 border-slate-100 text-center">
+                                    <p class="text-3xl font-black text-slate-700">${q.q}</p>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    ${q.options.map(opt => `
+                                        <button onclick="handleAnswer('${opt}')" ${state.selectedAnswer ? 'disabled' : ''} class="p-6 rounded-2xl text-2xl font-black transition-all border-b-4 ${state.selectedAnswer === opt ? (state.isCorrect ? 'bg-green-500 text-white border-green-700' : 'bg-red-500 text-white border-red-700') : 'bg-white text-slate-700 border-slate-200 hover:border-yellow-400 hover:bg-yellow-50'}">
+                                            ${opt}
+                                        </button>
+                                    `).join('')}
+                                </div>
+                                ${state.selectedAnswer ? `
+                                    <div class="p-6 rounded-2xl bg-slate-50 border-2 border-slate-100 space-y-4">
+                                        <p class="text-xl font-bold ${state.isCorrect ? 'text-green-600' : 'text-red-600'}">${state.isCorrect ? 'Correct! 🌟' : 'Try again next time!'}</p>
+                                        <p class="text-lg text-slate-600">${q.help}</p>
+                                        <button onclick="nextQuestion()" class="w-full bg-yellow-500 text-white py-4 rounded-2xl font-black text-xl shadow-lg border-b-4 border-yellow-700">Next Question</button>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (state.view === 'test') {
+                const q = state.quizQuestions[state.currentQuestionIndex];
+                container.innerHTML = `
+                    <div class="space-y-8">
+                        <div class="flex items-center justify-between">
+                            <button onclick="startModule('modules')" class="flex items-center gap-2 text-slate-500 font-bold hover:text-pink-500 transition-colors">
+                                <span>⬅️</span> Quit Test
+                            </button>
+                            <div class="bg-white px-4 py-2 rounded-full border-2 border-cyan-100 font-black text-cyan-600">
+                                Question ${state.currentQuestionIndex + 1} of ${state.quizQuestions.length}
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border-4 border-cyan-100">
+                            <div class="bg-cyan-500 p-6">
+                                <h3 class="text-2xl font-black text-white">Final Assessment</h3>
+                            </div>
+                            <div class="p-8 space-y-8">
+                                <div class="bg-slate-50 p-8 rounded-2xl border-2 border-slate-100 text-center">
+                                    <p class="text-3xl font-black text-slate-700">${q.q}</p>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    ${q.options.map(opt => `
+                                        <button onclick="handleAnswer('${opt}', true)" ${state.selectedAnswer ? 'disabled' : ''} class="p-6 rounded-2xl text-2xl font-black transition-all border-b-4 ${state.selectedAnswer === opt ? (state.isCorrect ? 'bg-green-500 text-white border-green-700' : 'bg-red-500 text-white border-red-700') : 'bg-white text-slate-700 border-slate-200 hover:border-cyan-400 hover:bg-cyan-50'}">
+                                            ${opt}
+                                        </button>
+                                    `).join('')}
+                                </div>
+                                ${state.selectedAnswer ? `
+                                    <button onclick="nextQuestion(true)" class="w-full bg-cyan-500 text-white py-4 rounded-2xl font-black text-xl shadow-lg border-b-4 border-cyan-700">Continue</button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (state.view === 'results') {
+                const percentage = (state.score / state.quizQuestions.length) * 100;
+                const isPass = percentage >= 80;
+                container.innerHTML = `
+                    <div class="bg-white rounded-3xl p-12 shadow-2xl border-4 ${isPass ? 'border-green-100' : 'border-slate-100'} text-center space-y-8">
+                        <div class="text-8xl">${isPass ? '🏆' : '💪'}</div>
+                        <div class="space-y-2">
+                            <h2 class="text-5xl font-black text-slate-800">${isPass ? 'Amazing Job, Jitya!' : 'Good Effort!'}</h2>
+                            <p class="text-2xl text-slate-500 font-medium">You scored ${state.score} out of ${state.quizQuestions.length}</p>
+                        </div>
+                        <div class="text-6xl font-black ${isPass ? 'text-green-500' : 'text-slate-400'}">${percentage}%</div>
+                        <div class="flex flex-col gap-4">
+                            <button onclick="startModule('test')" class="bg-cyan-500 text-white py-4 rounded-2xl font-black text-xl shadow-lg border-b-4 border-cyan-700">Try Again</button>
+                            <button onclick="goHome()" class="bg-white text-slate-500 py-4 rounded-2xl font-black text-xl border-2 border-slate-200">Back to Index</button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        render();
+    </script>
+</body>
 </html>
 
