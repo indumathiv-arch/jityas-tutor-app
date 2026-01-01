@@ -18,6 +18,7 @@
             100% { transform: translateY(0px) rotate(0deg); }
         }
         .float-animation { animation: float 4s ease-in-out infinite; }
+        .clock-hand { transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1); }
     </style>
 </head>
 <body class="bg-amber-50 min-h-screen pb-12 text-slate-800">
@@ -42,7 +43,8 @@
             {
                 id: 'ch7', title: 'Ch 7: Addition & Subtraction to 100', icon: '🧮', color: 'bg-pink-500',
                 learn: {
-                    concept: 'Adding and subtracting bigger numbers is just like smaller ones! We look at Tens and Ones. 25 + 4 = 29. 50 - 10 = 40.',
+                    concept: 'Adding and subtracting bigger numbers is just like smaller ones! We look at Tens and Ones.',
+                    visual: '25 + 4 = 29',
                     voiceText: "Hi Jitya! Let's learn to add and subtract up to 100. Remember, always start from the Ones place. If you have 25 candies and get 4 more, you have 29! If you have 50 and give 10 away, you have 40 left. You can do it!"
                 },
                 practice: [
@@ -73,7 +75,8 @@
             {
                 id: 'ch8', title: 'Chapter 8: Time', icon: '⏰', color: 'bg-cyan-500',
                 learn: {
-                    concept: 'Time tells us when things happen! Morning, Afternoon, Evening, and Night. Clocks show us hours and minutes.',
+                    concept: 'Time tells us when things happen! Morning, Afternoon, Evening, and Night.',
+                    visual: '☀️ 🕛 🌙',
                     voiceText: "Hi Jitya! Time is like a story. It starts in the morning when the sun comes up. Then it's afternoon, then evening, and finally night when we sleep. A clock has two hands to show us the time!"
                 },
                 practice: [
@@ -105,6 +108,7 @@
                 id: 'ch9', title: 'Chapter 9: Money', icon: '💰', color: 'bg-yellow-500',
                 learn: {
                     concept: 'Money helps us buy things! We use coins and notes. In India, we use Rupees (₹).',
+                    visual: '🪙 💵 ₹',
                     voiceText: "Hi Jitya! Money is what we use at the shop. We have shiny coins and paper notes. In India, we use Rupees. Can you identify a 10 rupee note? It's great for buying treats!"
                 },
                 practice: [
@@ -135,7 +139,8 @@
             {
                 id: 'ch10', title: 'Chapter 10: Measurement', icon: '📏', color: 'bg-green-500',
                 learn: {
-                    concept: 'Measurement helps us know how long, heavy, or full something is! Length, Weight, and Capacity.',
+                    concept: 'Measurement helps us know how long, heavy, or full something is!',
+                    visual: '📏 ⚖️ 🥛',
                     voiceText: "Hi Jitya! Measurement is like being a detective. We use our hands to see how long a table is, or a scale to see if a pumpkin is heavy. Capacity is how much milk fits in your glass!"
                 },
                 practice: [
@@ -166,7 +171,8 @@
             {
                 id: 'ch11', title: 'Chapter 11: Data Handling', icon: '📊', color: 'bg-orange-500',
                 learn: {
-                    concept: 'Data handling is collecting and sorting things! We count and group items to understand them.',
+                    concept: 'Data handling is collecting and sorting things!',
+                    visual: '🍎🍎 🍌🍌🍌',
                     voiceText: "Hi Jitya! Data handling is like tidying your toys. We count dolls, cars, and blocks. Then we see which one you have the most of!"
                 },
                 practice: [
@@ -197,7 +203,8 @@
             {
                 id: 'ch12', title: 'Chapter 12: Multiplication', icon: '✖️', color: 'bg-purple-500',
                 learn: {
-                    concept: 'Multiplication is adding the same number over and over! Shortcut for addition.',
+                    concept: 'Multiplication is adding the same number over and over!',
+                    visual: '2 + 2 + 2 = 6',
                     voiceText: "Hi Jitya! Multiplication is a shortcut. If you have 3 groups of 2 cookies, instead of 2+2+2, you say 3 times 2 is 6! It's like magic!"
                 },
                 practice: [
@@ -230,8 +237,28 @@
         let state = {
             view: 'home', selectedChapter: null, currentQuestionIndex: 0, score: 0,
             selectedAnswer: null, isCorrect: null, quizQuestions: [],
-            completedChapters: JSON.parse(localStorage.getItem('jitya_math_progress') || '{}')
+            completedChapters: JSON.parse(localStorage.getItem('jitya_math_progress') || '{}'),
+            timeAdventure: {
+                stage: 'clock', // 'parts_of_day', 'clock', 'calendar'
+                phase: 'teaching', // 'teaching', 'interactive'
+                step: 0,
+                hour: 12,
+                minute: 0,
+                showMinuteHand: true,
+                isListening: false,
+                isPaused: false,
+                isDragging: null, // 'hour' or 'minute'
+                teachingText: ""
+            }
         };
+
+        const TIME_EXAMPLES = [
+            { h: 7, m: 0, text: "Look at the clock. The short red hand is at 7 and the long blue hand is at 12. It is 7 o'clock." },
+            { h: 9, m: 0, text: "Now it is 9 o'clock. The hour hand is pointing to 9." },
+            { h: 10, m: 30, text: "The short hand is between 10 and 11. The long hand is at 6. It is ten thirty, or thirty minutes past ten." },
+            { h: 2, m: 15, text: "The long hand is at 3. That means 15 minutes have passed. It is two fifteen." },
+            { h: 5, m: 45, text: "The long hand is at 9. That is 45 minutes. It is five forty-five." }
+        ];
 
         function saveProgress(id) {
             state.completedChapters[id] = true;
@@ -240,18 +267,59 @@
         }
 
         function speak(text) {
-            window.speechSynthesis.cancel();
-            const u = new SpeechSynthesisUtterance(text);
-            u.pitch = 1.2; u.rate = 0.9;
-            window.speechSynthesis.speak(u);
+            return new Promise((resolve) => {
+                window.speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance(text);
+                u.pitch = 1.1; u.rate = 0.85; // Slightly slower for better clarity
+                u.lang = 'en-IN';
+                u.onend = () => resolve();
+                window.speechSynthesis.speak(u);
+            });
+        }
+
+        async function waitIfPaused() {
+            while (state.timeAdventure.isPaused) {
+                await new Promise(r => setTimeout(r, 100));
+            }
+        }
+
+        function togglePause() {
+            state.timeAdventure.isPaused = !state.timeAdventure.isPaused;
+            if (state.timeAdventure.isPaused) {
+                window.speechSynthesis.pause();
+            } else {
+                window.speechSynthesis.resume();
+            }
+            render();
         }
 
         function goHome() { state.view = 'home'; state.selectedChapter = null; render(); }
         function selectChapter(id) { state.selectedChapter = MATH_CURRICULUM.find(c => c.id === id); state.view = 'modules'; render(); }
         function startModule(type) {
+            if (state.selectedChapter.id === 'ch8' && (type === 'learn' || type === 'practice')) {
+                state.view = 'time_adventure';
+                state.timeAdventure.stage = 'clock';
+                state.timeAdventure.phase = 'teaching';
+                state.timeAdventure.step = 0;
+                render();
+                runTimeTeachingSequence();
+                return;
+            }
             state.view = type; state.currentQuestionIndex = 0; state.score = 0;
             state.selectedAnswer = null; state.isCorrect = null;
-            state.quizQuestions = type === 'test' ? [...state.selectedChapter.test] : [...state.selectedChapter.practice];
+            
+            let questions = type === 'test' ? [...state.selectedChapter.test] : [...state.selectedChapter.practice];
+            
+            // Shuffle options for each question
+            state.quizQuestions = questions.map(q => {
+                let shuffledOptions = [...q.options];
+                for (let i = shuffledOptions.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffledOptions[i], shuffledOptions[j]] = [shuffledOptions[j], shuffledOptions[i]];
+                }
+                return { ...q, options: shuffledOptions };
+            });
+            
             render();
         }
 
@@ -292,6 +360,206 @@
             `;
         }
 
+        async function runTimeTeachingSequence() {
+            state.timeAdventure.phase = 'teaching';
+            state.timeAdventure.showMinuteHand = true;
+            state.timeAdventure.hour = 12;
+            state.timeAdventure.minute = 0;
+            state.timeAdventure.isPaused = false;
+            state.timeAdventure.teachingText = "Hello! Today we are going to learn how to read a clock. Clocks have two very important hands that help us tell time.";
+            render();
+            await speak(state.timeAdventure.teachingText);
+            await waitIfPaused();
+            await new Promise(r => setTimeout(r, 500));
+
+            // Step A: The Hour Hand
+            await waitIfPaused();
+            state.timeAdventure.showMinuteHand = false;
+            state.timeAdventure.teachingText = "This short red hand is the Hour Hand. It is short because it only cares about the big numbers. When it points to a number, we just say that number and add 'o-clock'!";
+            render();
+            await speak(state.timeAdventure.teachingText);
+            
+            const hourExamples = [
+                { h: 3, t: "Look! The hour hand points to 3. It is 3 o'clock." },
+                { h: 6, t: "Now it points to 6. It is 6 o'clock." },
+                { h: 10, t: "And now it is at 10. It is 10 o'clock." }
+            ];
+            for (const ex of hourExamples) {
+                await waitIfPaused();
+                state.timeAdventure.hour = ex.h;
+                state.timeAdventure.teachingText = ex.t;
+                render();
+                await speak(ex.t);
+                await new Promise(r => setTimeout(r, 800));
+            }
+
+            // Step B: The Minute Hand
+            await waitIfPaused();
+            state.timeAdventure.showMinuteHand = true;
+            state.timeAdventure.hour = 12;
+            state.timeAdventure.minute = 0;
+            state.timeAdventure.teachingText = "This long blue hand is the Minute Hand. It moves faster and helps us count the tiny minutes. The long hand is special because it skips!";
+            render();
+            await speak(state.timeAdventure.teachingText);
+
+            for (let m = 5; m <= 55; m += 5) {
+                await waitIfPaused();
+                state.timeAdventure.minute = m;
+                state.timeAdventure.teachingText = `${m} minutes...`;
+                render();
+                await speak(state.timeAdventure.teachingText);
+                await new Promise(r => setTimeout(r, 300));
+            }
+            await waitIfPaused();
+            state.timeAdventure.teachingText = "We count by fives just like our fingers! All the way to sixty!";
+            render();
+            await speak(state.timeAdventure.teachingText);
+            await new Promise(r => setTimeout(r, 1000));
+
+            // Step C: Real Examples
+            await waitIfPaused();
+            state.timeAdventure.teachingText = "Now let us see how these hands work together for some daily activities!";
+            render();
+            await speak(state.timeAdventure.teachingText);
+
+            for (let i = 0; i < TIME_EXAMPLES.length; i++) {
+                await waitIfPaused();
+                state.timeAdventure.step = i;
+                state.timeAdventure.hour = TIME_EXAMPLES[i].h;
+                state.timeAdventure.minute = TIME_EXAMPLES[i].m;
+                state.timeAdventure.teachingText = TIME_EXAMPLES[i].text;
+                render();
+                await speak(TIME_EXAMPLES[i].text);
+                await new Promise(r => setTimeout(r, 1200));
+            }
+            
+            await waitIfPaused();
+            state.timeAdventure.phase = 'interactive';
+            state.timeAdventure.teachingText = "Now you know the secret! The short hand tells the hour, and the long hand skip-counts the minutes. Are you ready to try moving them yourself?";
+            render();
+            await speak(state.timeAdventure.teachingText);
+        }
+
+        function getClockTimeText(h, m) {
+            const numbers = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty", "twenty-one", "twenty-two", "twenty-three", "twenty-four", "twenty-five", "twenty-six", "twenty-seven", "twenty-eight", "twenty-nine", "thirty", "thirty-one", "thirty-two", "thirty-three", "thirty-four", "thirty-five", "thirty-six", "thirty-seven", "thirty-eight", "thirty-nine", "forty", "forty-one", "forty-two", "forty-three", "forty-four", "forty-five", "forty-six", "forty-seven", "forty-eight", "forty-nine", "fifty", "fifty-one", "fifty-two", "fifty-three", "fifty-four", "fifty-five", "fifty-six", "fifty-seven", "fifty-eight", "fifty-nine"];
+            
+            if (m === 0) return `${numbers[h]} o'clock`;
+            return `${numbers[h]} ${numbers[m]}`;
+        }
+
+        function handleClockInteraction(e) {
+            if (state.timeAdventure.phase !== 'interactive') return;
+            const svg = document.getElementById('analog-clock');
+            if (!svg) return;
+            const rect = svg.getBoundingClientRect();
+            const x = (e.clientX || e.touches[0].clientX) - rect.left - 150;
+            const y = (e.clientY || e.touches[0].clientY) - rect.top - 150;
+            let angle = Math.atan2(y, x) * (180 / Math.PI) + 90;
+            if (angle < 0) angle += 360;
+
+            if (state.timeAdventure.isDragging === 'minute') {
+                let m = Math.round(angle / 6) % 60;
+                // Snap to 5 mins for easier learning
+                m = Math.round(m / 5) * 5 % 60;
+                state.timeAdventure.minute = m;
+            } else if (state.timeAdventure.isDragging === 'hour') {
+                let h = Math.round(angle / 30) % 12;
+                if (h === 0) h = 12;
+                state.timeAdventure.hour = h;
+            }
+            render();
+        }
+
+        function stopDragging() {
+            if (state.timeAdventure.isDragging) {
+                const timeStr = getClockTimeText(state.timeAdventure.hour, state.timeAdventure.minute);
+                speak(`You moved the hands to ${timeStr}.`);
+                if (state.timeAdventure.minute === 30) {
+                    speak("Count with me: 5, 10, 15, 20, 25, 30! That is thirty minutes past the hour.");
+                }
+            }
+            state.timeAdventure.isDragging = null;
+        }
+
+        function startVoiceRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert("Voice recognition not supported in this browser.");
+                return;
+            }
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'en-IN';
+            state.timeAdventure.isListening = true;
+            render();
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript.toLowerCase();
+                console.log("Heard:", transcript);
+                if (transcript.includes("15 minutes") || transcript.includes("quarter past")) {
+                    state.timeAdventure.minute = 15;
+                    speak("Look! I moved the long hand to 3. That is 15 minutes.");
+                } else if (transcript.includes("30 minutes") || transcript.includes("half past")) {
+                    state.timeAdventure.minute = 30;
+                    speak("There! The long hand is at 6. That is 30 minutes.");
+                } else if (transcript.includes("o'clock")) {
+                    state.timeAdventure.minute = 0;
+                    speak("O'clock means the long hand is right at the top, on 12.");
+                } else {
+                    speak("I heard you say " + transcript + ". Try asking me where 15 minutes is.");
+                }
+                state.timeAdventure.isListening = false;
+                render();
+            };
+
+            recognition.onerror = () => {
+                state.timeAdventure.isListening = false;
+                render();
+            };
+
+            recognition.start();
+        }
+
+        function renderClockSVG() {
+            const h = state.timeAdventure.hour;
+            const m = state.timeAdventure.minute;
+            const hDeg = (h % 12) * 30 + (m / 60) * 30;
+            const mDeg = m * 6;
+            const isInteractive = state.timeAdventure.phase === 'interactive';
+
+            return `
+                <svg id="analog-clock" viewBox="0 0 300 300" class="w-64 h-64 mx-auto drop-shadow-2xl ${state.timeAdventure.phase === 'teaching' ? 'animate-pulse' : ''}" 
+                    onmousemove="handleClockInteraction(event)" onmouseup="stopDragging()" ontouchmove="handleClockInteraction(event)" ontouchend="stopDragging()">
+                    <!-- Face -->
+                    <circle cx="150" cy="150" r="140" fill="white" stroke="#e2e8f0" stroke-width="8" />
+                    <circle cx="150" cy="150" r="130" fill="none" stroke="#f1f5f9" stroke-width="2" />
+                    
+                    <!-- Numbers -->
+                    ${[12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((n, i) => {
+                        const ang = (i * 30) * (Math.PI / 180);
+                        const x = 150 + 110 * Math.sin(ang);
+                        const y = 150 - 110 * Math.cos(ang);
+                        return `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" class="text-2xl font-black fill-slate-400">${n}</text>`;
+                    }).join('')}
+
+                    <!-- Hour Hand (Red) -->
+                    <g transform="rotate(${hDeg} 150 150)" class="clock-hand ${isInteractive ? 'cursor-grab active:cursor-grabbing' : ''}" onmousedown="state.timeAdventure.isDragging='hour'" ontouchstart="state.timeAdventure.isDragging='hour'">
+                        <line x1="150" y1="150" x2="150" y1="80" stroke="#ef4444" stroke-width="10" stroke-linecap="round" />
+                        <circle cx="150" cy="150" r="6" fill="#ef4444" />
+                    </g>
+
+                    <!-- Minute Hand (Blue) -->
+                    ${state.timeAdventure.showMinuteHand ? `
+                    <g transform="rotate(${mDeg} 150 150)" class="clock-hand ${isInteractive ? 'cursor-grab active:cursor-grabbing' : ''}" onmousedown="state.timeAdventure.isDragging='minute'" ontouchstart="state.timeAdventure.isDragging='minute'">
+                        <line x1="150" y1="150" x2="150" y2="50" stroke="#3b82f6" stroke-width="6" stroke-linecap="round" />
+                        <circle cx="150" cy="150" r="4" fill="#3b82f6" />
+                    </g>
+                    ` : ''}
+                    
+                    <circle cx="150" cy="150" r="4" fill="white" />
+                </svg>
+            `;
+        }
+
         function render() {
             const container = document.getElementById('app-content');
             renderHeaderStats();
@@ -318,6 +586,103 @@
                                 </button>
                             `).join('')}
                         </div>
+                    </div>
+                `;
+            } else if (state.view === 'time_adventure') {
+                const ta = state.timeAdventure;
+                let bgClass = "bg-sky-400"; // Morning
+                if (ta.hour >= 12 && ta.hour < 17) bgClass = "bg-blue-400"; // Afternoon
+                if (ta.hour >= 17 && ta.hour < 20) bgClass = "bg-orange-400"; // Evening
+                if (ta.hour >= 20 || ta.hour < 6) bgClass = "bg-slate-900"; // Night
+
+                container.innerHTML = `
+                    <div class="space-y-6">
+                        <div class="flex items-center justify-between">
+                            <button onclick="selectChapter('ch8')" class="flex items-center gap-2 text-slate-500 font-bold hover:text-pink-500 transition-colors">⬅️ Back to Chapter</button>
+                            <div class="flex gap-2">
+                                <button onclick="state.timeAdventure.stage='clock'; render();" class="px-4 py-2 rounded-full font-bold ${ta.stage === 'clock' ? 'bg-cyan-500 text-white' : 'bg-white text-slate-500'} shadow-sm">🕒 Clock</button>
+                                <button onclick="state.timeAdventure.stage='parts_of_day'; render();" class="px-4 py-2 rounded-full font-bold ${ta.stage === 'parts_of_day' ? 'bg-cyan-500 text-white' : 'bg-white text-slate-500'} shadow-sm">☀️ Day Parts</button>
+                                <button onclick="state.timeAdventure.stage='calendar'; render();" class="px-4 py-2 rounded-full font-bold ${ta.stage === 'calendar' ? 'bg-cyan-500 text-white' : 'bg-white text-slate-500'} shadow-sm">📅 Calendar</button>
+                            </div>
+                        </div>
+
+                        ${ta.stage === 'clock' ? `
+                            <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border-4 border-cyan-100">
+                                <div class="bg-cyan-500 p-6 flex items-center justify-between text-white">
+                                    <h3 class="text-2xl font-black">Time Adventure</h3>
+                                    <button onclick="startVoiceRecognition()" class="bg-white text-cyan-600 px-6 py-3 rounded-full font-black flex items-center gap-2 shadow-md bounce-hover ${ta.isListening ? 'animate-pulse ring-4 ring-cyan-200' : ''}">
+                                        🎤 ${ta.isListening ? 'Listening...' : 'Ask Me!'}
+                                    </button>
+                                </div>
+                                <div class="p-8 flex flex-col items-center gap-8 ${bgClass} transition-colors duration-1000">
+                                    <div class="relative">
+                                        ${renderClockSVG()}
+                                        ${ta.phase === 'teaching' ? `
+                                            <div class="absolute -top-6 left-1/2 -translate-x-1/2 flex items-center gap-2">
+                                                <div class="bg-white/90 backdrop-blur px-6 py-2 rounded-full font-black shadow-lg border-2 border-cyan-400 text-cyan-600 whitespace-nowrap">🎓 Learning Mode</div>
+                                                <button onclick="togglePause()" class="bg-white p-2 rounded-full shadow-lg border-2 border-cyan-400 text-cyan-600 hover:bg-cyan-50 transition-colors">
+                                                    ${ta.isPaused ? '▶️' : '⏸️'}
+                                                </button>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                    
+                                    <div class="bg-white/90 backdrop-blur p-6 rounded-3xl shadow-xl text-center space-y-2 min-w-[200px]">
+                                        <div class="text-5xl font-black text-slate-700 tabular-nums">
+                                            ${String(ta.hour).padStart(2, '0')}:${String(ta.minute).padStart(2, '0')}
+                                        </div>
+                                        <div class="text-xl font-bold text-cyan-600 uppercase tracking-widest">
+                                            ${getClockTimeText(ta.hour, ta.minute)}
+                                        </div>
+                                    </div>
+
+                                    <div class="bg-white p-6 rounded-2xl shadow-lg max-w-md text-center border-l-8 border-cyan-500">
+                                        <p class="text-xl font-bold text-slate-600 italic">
+                                            ${ta.phase === 'teaching' ? ta.teachingText : "Move the hands to see how time changes! Or click the mic and ask 'Where is 15 minutes?'"}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        ${ta.stage === 'parts_of_day' ? `
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                ${[
+                                    { t: 'Morning', i: '☀️', d: 'Sun rises, breakfast time!', c: 'bg-yellow-100 border-yellow-400' },
+                                    { t: 'Afternoon', i: '🕛', d: 'Sun is high, lunch time!', c: 'bg-blue-100 border-blue-400' },
+                                    { t: 'Evening', i: '🌆', d: 'Sun sets, play time!', c: 'bg-orange-100 border-orange-400' },
+                                    { t: 'Night', i: '🌙', d: 'Moon is out, sleep time!', c: 'bg-slate-800 border-slate-600 text-white' }
+                                ].map(p => `
+                                    <div class="p-8 rounded-3xl border-4 ${p.c} shadow-lg space-y-4 text-center">
+                                        <div class="text-6xl">${p.i}</div>
+                                        <h4 class="text-3xl font-black">${p.t}</h4>
+                                        <p class="text-xl font-medium opacity-80">${p.d}</p>
+                                        <button onclick="speak('In the ${p.t}, ${p.d}')" class="bg-white/20 px-4 py-2 rounded-full font-bold">Hear More</button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+
+                        ${ta.stage === 'calendar' ? `
+                            <div class="bg-white rounded-3xl p-8 shadow-xl border-4 border-cyan-100 space-y-8">
+                                <div class="text-center">
+                                    <h3 class="text-3xl font-black text-slate-800">Days of the Week</h3>
+                                    <div class="flex flex-wrap justify-center gap-2 mt-4">
+                                        ${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(d => `
+                                            <button onclick="speak('${d}')" class="px-4 py-2 bg-slate-100 rounded-xl font-bold hover:bg-cyan-100 transition-colors">${d}</button>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <h3 class="text-3xl font-black text-slate-800">Months of the Year</h3>
+                                    <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 mt-4">
+                                        ${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map(m => `
+                                            <button onclick="speak('${m}')" class="p-3 bg-pink-50 rounded-xl font-bold hover:bg-pink-200 transition-colors text-pink-600">${m}</button>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        ` : ''}
                     </div>
                 `;
             } else if (state.view === 'modules') {
